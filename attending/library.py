@@ -1,13 +1,12 @@
 from pathlib import Path
-import urllib.request
 from dataclasses import dataclass
+from .downloader import write_to_file
 
 
 class Library:
     def __init__(self, home=Path().home()):
         self.location = self._construct(home / Path(".attending"))
         self.docs = self._load_docs()
-        print(self.docs)
 
     def fetch(self, module):
         if hasattr(module, "__doc_url__"):
@@ -26,9 +25,7 @@ class Library:
         if location.exists():
             raise FileExistsError(f"{name} already exists")
         location.mkdir(parents=True)
-        with open(location / Path(name + ".pdf"), "wb") as f:
-            with urllib.request.urlopen(url) as doc:
-                f.write(doc.read())
+        write_to_file(url, location, name)
         self.docs[name] = Doc(name, location)
 
     def _load_docs(self):
