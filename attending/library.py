@@ -1,5 +1,7 @@
 from pathlib import Path
 from dataclasses import dataclass
+import webbrowser
+
 from .downloader import write_to_file
 
 
@@ -46,3 +48,6 @@ class Library:
 class Doc:
     name: str
     location: Path
+
+    def diagnose(self):
+        webbrowser.open(f"file://{self.location}")
