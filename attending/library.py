@@ -12,7 +12,6 @@ class Library:
     def __init__(self, home=Path().home()):
         self.location = self._construct(home / Path(".attending"))
         self.docs = self._load_docs()
-        print(self.docs)
 
     def fetch(self, module):
         if not hasattr(module, "__doc_url__"):
@@ -44,6 +43,16 @@ class Library:
                         docs[(project.stem, version.name)] = \
                             Doc(project.stem, DocLocation(self.location, project.stem, version.name))
         return docs
+
+    def retire(self, module):
+        if module not in self:
+            raise LookupError(f"not tracking {module.__name__}")
+        doc = self.docs[_module_identifier(module)]
+        del self.docs[_module_identifier(module)]
+        doc.retire()
+
+    def __repr__(self):
+        return str(self.docs)
 
     def __contains__(self, module):
         return _module_identifier(module) in self.docs
