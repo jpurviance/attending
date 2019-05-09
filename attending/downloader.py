@@ -2,24 +2,26 @@ import urllib.request
 from pathlib import Path
 from zipfile import ZipFile
 
+from .Doc import DocLocation
 
-def extract_zip(directory: Path, file: Path):
-    ZipFile(file).extractall(path=directory)
+
+def extract_zip(doc_location: DocLocation, file: Path):
+    ZipFile(file).extractall(path=doc_location.full_path())
     file.unlink()
 
 
-def write_to_file(url, directory, name):
+def write_to_file(url, doc_location: DocLocation):
     with urllib.request.urlopen(url) as connection:
         if 400 > connection.status >= 300:
-            write_to_file(connection.getheader("Location"), directory, name)
+            write_to_file(connection.getheader("Location"), doc_location)
         elif connection.status == 200:
             file_extension = _EXTENSION_MAPPING.get(connection.getheader('Content-Type'), 'txt')
-            target = directory / Path(f"{name}.{file_extension}")
+            target = doc_location.full_path() / Path(f"{doc_location.name}.{file_extension}")
             with open(target, "wb") as f:
                 for bytes in range(0, int(connection.getheader("Content-Length")), 1024):
                     f.write(connection.read(bytes))
             if file_extension in _EXTENSION_POST_DIRECTIVES:
-                _EXTENSION_POST_DIRECTIVES[file_extension](directory, target)
+                _EXTENSION_POST_DIRECTIVES[file_extension](doc_location, target)
         else:
             raise LookupError(f"Failed to fetch docs at {url}, http status: {connection.status}")
 
