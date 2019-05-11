@@ -1,5 +1,6 @@
 import foobar
 import fizbuz
+
 from attending import Library
 
 library = Library()
