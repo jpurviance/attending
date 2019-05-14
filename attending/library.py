@@ -2,7 +2,7 @@ from pathlib import Path
 from functools import wraps
 
 from .downloader import write_to_file
-from .Doc import Module
+from .doc import Module
 
 
 def can_monitor(module):
