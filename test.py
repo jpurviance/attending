@@ -4,13 +4,14 @@ import fizbuz
 from attending import Library
 
 library = Library()
-print(foobar in library)
-library.fetch(foobar)
-print(foobar in library)
-print(library[foobar])
 
-print(fizbuz in library)
+print(f"foobar managed by attending? {foobar in library}")
+print("fetching foobar's docs")
+library.fetch(foobar)
+print(f"foobar managed by attending? {foobar in library}")
+
+print(f"fizbuz managed by attending? {fizbuz in library}")
+print("fizbuz foobar's docs")
 library.fetch(fizbuz)
-print(fizbuz in library)
-print(library[fizbuz])
+print(f"fizbuz managed by attending? {fizbuz in library}")
 library[fizbuz].diagnose()
