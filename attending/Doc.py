@@ -26,7 +26,7 @@ class Doc(metaclass=_Cached):
         self.version = version
 
     def diagnose(self):
-        webbrowser.open(str(self.base_path / self.name / self.version))
+        webbrowser.open("file://" +str(self.base_path / self.name / self.version))
 
     def retire(self):
         shutil.rmtree(self.base_path / self.name / self.version)
