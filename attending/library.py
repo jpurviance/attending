@@ -2,22 +2,25 @@ from pathlib import Path
 from functools import wraps
 
 from .downloader import write_to_file
-from .doc import Module
+from .doc import Module, get_module_version
 
-MONITOR_ERROR="""'{0}' needs both __doc_url__  and __version__ defined. It has
+MONITOR_ERROR = """'{0}' needs both __doc_url__  and __version__ defined. It has
 {0}.__doc_url__ = {1}
 {0}.__version__ = {2}
 """
 
+
 def can_monitor(module):
-    return hasattr(module, "__doc_url__") and hasattr(module, "__version__")
+    return hasattr(module, "__doc_url__")
+
 
 def cannot_monitor(module):
     msg = MONITOR_ERROR.format(module.__name__,
-            module.__dict__.get("__doc_url__"),
-            module.__dict__.get("__version__"))
+                               module.__dict__.get("__doc_url__"),
+                               module.__dict__.get("__version__"))
 
     return ValueError(msg)
+
 
 def _requires_valid_module(f):
     @wraps(f)
@@ -46,11 +49,11 @@ class Library:
         return self[module]
 
     def _add_project(self, module):
-        destination = self.location / module.__name__ / module.__version__
+        destination = self.location / module.__name__ / get_module_version(module)
         if destination.exists():
             raise FileExistsError(f"{destination}")
         destination.mkdir(parents=True)
-        write_to_file(self.location, module.__name__, module.__version__, module.__doc_url__)
+        write_to_file(self.location, module.__name__, get_module_version(module), module.__doc_url__)
         self.docs[module.__name__] = Module(self.location, module.__name__)
 
     @_requires_valid_module

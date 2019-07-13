@@ -4,6 +4,12 @@ import shutil
 import os
 
 
+def get_module_version(module):
+    if hasattr(module, "__version__"):
+        return module.__version__
+    return "latest"
+
+
 class _Cached(type):
 
     def __init__(cls, name, bases, dct):
@@ -26,7 +32,7 @@ class Doc(metaclass=_Cached):
         self.version = version
 
     def diagnose(self):
-        webbrowser.open("file://" +str(self.base_path / self.name / self.version))
+        webbrowser.open("file://" + str(self.base_path / self.name / self.version))
 
     def retire(self):
         shutil.rmtree(self.base_path / self.name / self.version)
@@ -53,12 +59,12 @@ class Module(metaclass=_Cached):
         doc.retire()
 
     def __contains__(self, module):
-        candidate = self.base_path / self.name / module.__version__
+        candidate = self.base_path / self.name / get_module_version(module)
         return candidate.is_dir() and len(os.listdir(str(candidate)))
 
     def __getitem__(self, module):
         if module in self:
-            return Doc(self.base_path, self.name, module.__version__)
+            return Doc(self.base_path, self.name, get_module_version(module))
         raise KeyError()  # TODO give this a message
 
     def __str__(self):
